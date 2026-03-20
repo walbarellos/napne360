@@ -21,6 +21,8 @@ from backend.app.models import Entrevista_Estruturada_Sessao
 from backend.app.models import Entrevista_Resposta_Por_Categoria
 from backend.app.models import Hipotese_Diagnostica_Gerada
 from backend.app.models import Regra_Motor_Hipoteses
+from backend.app.models import PEI_Plano_Educacional_Individual
+from backend.app.models import PEI_Componentes
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
