@@ -23,6 +23,9 @@ from backend.app.models import Hipotese_Diagnostica_Gerada
 from backend.app.models import Regra_Motor_Hipoteses
 from backend.app.models import PEI_Plano_Educacional_Individual
 from backend.app.models import PEI_Componentes
+from backend.app.models import Alerta_Monitoramento_Risco_Estudante
+from backend.app.models import Formulario_Mensal_Docente_Resposta
+from backend.app.models import Regra_Alerta_Configuracao
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
