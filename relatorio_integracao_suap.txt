@@ -1,0 +1,73 @@
+# RELATÓRIO DE INTEGRAÇÃO SUAP (IFAC) - MARÇO 2026
+
+## 1. Informações Gerais
+- **Base URL:** https://suap.ifac.edu.br
+- **Arquitetura da API:** Django Ninja (moderna, baseada em OpenAPI/Pydantic).
+- **Documentação Swagger:** https://suap.ifac.edu.br/api/docs/
+- **Schema OpenAPI (JSON):** https://suap.ifac.edu.br/openapi.json
+
+## 2. Autenticação e Cookies
+Diferente de instâncias mais antigas, o SUAP IFAC utiliza cookies com o prefixo `__Host-` por segurança (HSTS/Secure).
+- **CSRF Token:** `__Host-csrftoken`
+- **Session ID:** `__Host-sessionid`
+
+O fluxo de login requer:
+1. GET em `/accounts/login/` para capturar o CSRF inicial.
+2. POST em `/accounts/login/` com `username`, `password`, `csrfmiddlewaretoken` e o header `Referer`.
+
+## 3. Endpoints Validados (JSON)
+| Nome | Rota | Descrição |
+|------|------|-----------|
+| Dados do Usuário | `/api/eu/` | Nome, e-mail, campus, tipo de vínculo. |
+| Dados Detalhados | `/api/v2/minhas-informacoes/meus-dados/` | Matrícula, situação, curso, turno. |
+| Dados Acadêmicos | `/api/edu/meus-dados-aluno/` | IRA, período, matriz curricular. |
+
+## 4. Código Python para Integração (Funcional)
+
+```python
+import httpx
+
+def integrar_suap(username, password):
+    base_url = "https://suap.ifac.edu.br"
+    client = httpx.Client(base_url=base_url, follow_redirects=True)
+
+    # 1. CSRF
+    client.get("/accounts/login/")
+    csrf = client.cookies.get("__Host-csrftoken")
+
+    # 2. Login
+    payload = {
+        "username": username,
+        "password": password,
+        "csrfmiddlewaretoken": csrf,
+        "next": "/"
+    }
+    headers = {"Referer": f"{base_url}/accounts/login/"}
+    
+    r = client.post("/accounts/login/", data=payload, headers=headers)
+    
+    if "__Host-sessionid" not in client.cookies:
+        return {"erro": "Falha na autenticação"}
+
+    # 3. Coleta de Dados
+    results = {}
+    endpoints = {
+        "identidade": "/api/eu/",
+        "academico": "/api/edu/meus-dados-aluno/"
+    }
+
+    for key, path in endpoints.items():
+        res = client.get(path)
+        if res.status_code == 200:
+            results[key] = res.json()
+            
+    return results
+
+# Exemplo de uso:
+# dados = integrar_suap("20261CRB12697480019", "SENHA_AQUI")
+```
+
+## 5. Observações para Auditoria (Claude)
+- A instância não responde mais aos endpoints `/api/v2/edu/alunos/` ou `/api/v2/minhasatividades/eu/` que eram comuns em versões anteriores do SUAP (IFRN).
+- O uso de `httpx` é recomendado por lidar nativamente com HTTP/2 e cookies de forma eficiente.
+- Todos os endpoints retornam `application/json` padrão.

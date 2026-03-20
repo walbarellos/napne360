@@ -1,0 +1,19 @@
+# STATUS DO PROJETO NAPNE 360° - AUTENTICAÇÃO E RBAC
+
+## 1. Segurança e JWT
+- Hashing: passlib (bcrypt==4.0.1 para compatibilidade)
+- Tokens: PyJWT (HS256, Expiração: 8h)
+- Utilitário: `backend/app/utils/Auth_JWT_Controle_Perfis_RBAC.py`
+  - Funções: `hash_senha`, `verificar_senha`, `criar_token`, `get_usuario_atual`, `exigir_perfil`.
+
+## 2. Rotas de Autenticação
+- Endpoint: POST `/auth/login`
+- Registro: Integrado no `main.py`.
+
+## 3. Banco de Dados (Seed Inicial)
+- Usuário Admin: admin@napne.local / admin123 (CRIADO)
+- Correção de Schema: Colunas `criado_em` e `atualizado_em` migradas para `TIMESTAMP WITH TIMEZONE`.
+
+## 4. Teste de Acesso
+- Acessar: http://localhost:8000/docs
+- Credenciais: username=`admin@napne.local`, password=`admin123`.

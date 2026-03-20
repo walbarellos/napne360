@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+server.log
+auditoria_suap.txt
+teste_integracao_final.py
+teste_entrevista_motor.py
+teste_motor_asgi.py
+napne_test.py
