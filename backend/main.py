@@ -5,6 +5,7 @@ from backend.app.routes.LGPD_Rotas_Consentimento_Estudante import router as lgpd
 from backend.app.routes.Entrevista_Rotas_Formulario_Hipoteses import router as entrevista_router
 from backend.app.routes.PEI_Rotas_Gerador_Edicao_Export import router as pei_router
 from backend.app.routes.Alerta_Rotas_Dashboard_Monitoramento import router as alerta_router
+from backend.app.routes.Dashboard_Rotas_Painel_Indicadores import router as dashboard_router
 
 app = FastAPI(
     title="NAPNE 360°",
@@ -18,6 +19,7 @@ app.include_router(lgpd_router)
 app.include_router(entrevista_router)
 app.include_router(pei_router)
 app.include_router(alerta_router)
+app.include_router(dashboard_router)
 
 @app.get("/health")
 async def health():
