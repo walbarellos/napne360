@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  --bg:        #F7F5F0;
+  --surface:   #FFFFFF;
+  --border:    #E2DDD6;
+  --text:      #1A1A1A;
+  --muted:     #6B6560;
+  --primary:   #1B4F72;   /* azul institucional */
+  --primary-h: #154060;
+  --success:   #1A6B3C;
+  --warning:   #8B4A00;
+  --danger:    #8B1A1A;
+  --radius:    12px;
+  --font-size-base: 17px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* botões grandes — área mínima 44px */
+button, [role="button"] { min-height: 44px; }
+
+/* foco visível — acessibilidade */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}

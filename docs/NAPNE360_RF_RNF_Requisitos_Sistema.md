@@ -109,11 +109,11 @@ letramento digital), docentes (acesso esporádico), gestão institucional (relat
 | RF09.3 | Log de auditoria obrigatório para CREATE/UPDATE/DELETE em dados sensíveis (diagnóstico, laudo, PEI) |
 | RF09.4 | Sessão expira em 8 horas de inatividade; re-autenticação obrigatória para ações destrutivas |
 
-### RF10 — Módulo: Integracao_NAES_UFAC (Fase 2)
+### RF10 — Módulo: Integracao_NAAHS_IFAC (Fase 2)
 
 | ID | Requisito |
 |----|-----------|
-| RF10.1 | Arquitetura deve prever integração futura com NAES da UFAC via API REST |
+| RF10.1 | Arquitetura deve prever integração futura com NAAH-S do IFAC via API REST |
 | RF10.2 | Endpoints documentados via OpenAPI/Swagger; autenticação OAuth2 client_credentials |
 | RF10.3 | Exportar/importar dossiê de estudante transferido entre instituições com consentimento registrado |
 

@@ -22,6 +22,11 @@ class ModalidadeEnsino(str, enum.Enum):
     subsequente     = "subsequente"
     superior        = "superior"
 
+class TipoCotaPCD(str, enum.Enum):
+    nenhuma = "nenhuma"   # ampla concorrência
+    pcd     = "pcd"       # deficiência — independe de renda/escola
+    ppi_pcd = "ppi_pcd"   # deficiência + racial + renda + escola pública
+
 class MatriculaEntradaSistema(Base):
     __tablename__ = "matricula_entrada_sistema"
 
@@ -29,6 +34,7 @@ class MatriculaEntradaSistema(Base):
     id_estudante         : Mapped[uuid.UUID]        = mapped_column(ForeignKey("estudante_dados_cadastrais.id"), nullable=False)
     curso                : Mapped[str]              = mapped_column(String(300), nullable=False)
     modalidade           : Mapped[ModalidadeEnsino] = mapped_column(SAEnum(ModalidadeEnsino), nullable=False)
+    tipo_cota_pcd        : Mapped[TipoCotaPCD]      = mapped_column(SAEnum(TipoCotaPCD), default=TipoCotaPCD.nenhuma)
     periodo_referencia   : Mapped[int]              = mapped_column(nullable=False)
     status               : Mapped[StatusMatricula]  = mapped_column(SAEnum(StatusMatricula), default=StatusMatricula.aguardando_triagem)
     declarou_necessidade : Mapped[bool]             = mapped_column(Boolean, default=False)
@@ -37,6 +43,3 @@ class MatriculaEntradaSistema(Base):
     criado_em            : Mapped[datetime]         = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     estudante = relationship("EstudanteDadosCadastrais", back_populates="matriculas")
-
-# Adiciona a relação inversa em EstudanteDadosCadastrais se necessário, 
-# mas backref/back_populates precisa ser consistente.

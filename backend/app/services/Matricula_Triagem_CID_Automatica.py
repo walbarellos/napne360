@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from backend.app.models.Estudante_Dados_Cadastrais import EstudanteDadosCadastrais
 from backend.app.models.Matricula_Entrada_Sistema import (
-    MatriculaEntradaSistema, StatusMatricula, ModalidadeEnsino
+    MatriculaEntradaSistema, StatusMatricula, ModalidadeEnsino, TipoCotaPCD
 )
 from backend.app.models.Dossie_Perfil_Longitudinal_Estudante import DossiePerfilLongitudinalEstudante
 from backend.app.utils.SUAP_Sincronizacao_Dados_Aluno import buscar_dados_suap
@@ -13,15 +13,16 @@ async def registrar_estudante_via_suap(
     matricula_suap       : str,
     declarou_necessidade : bool,
     modalidade           : ModalidadeEnsino,
+    tipo_cota_pcd        : TipoCotaPCD,
     suap_username        : str,
     suap_password        : str,
     db                   : AsyncSession,
 ) -> MatriculaEntradaSistema:
 
-    # 1. Puxa dados do SUAP (faz o login na hora com as credenciais fornecidas)
+    # 1. puxa dados do SUAP
     dados = await buscar_dados_suap(suap_username, suap_password)
 
-    # 2. Verifica se o estudante já existe por matrícula
+    # 2. estudante já existe?
     result = await db.execute(
         select(EstudanteDadosCadastrais)
         .where(EstudanteDadosCadastrais.matricula_suap == matricula_suap)
@@ -33,24 +34,24 @@ async def registrar_estudante_via_suap(
             nome_registro  = dados["nome"],
             matricula_suap = dados["matricula"],
             cpf            = dados["cpf"],
-            data_nascimento= date(1900, 1, 1),  # Placeholder pois o SUAP não retornou no teste inicial
+            data_nascimento= date(1900, 1, 1),
             email          = dados["email"],
             campus         = dados["campus"],
         )
         db.add(estudante)
-        await db.flush()  # Gera o ID para as FKs
+        await db.flush()
 
-    # 3. Cria a matrícula no NAPNE 360
+    # 3. cria matrícula
     status_inicial = (
         StatusMatricula.aguardando_triagem
         if declarou_necessidade
         else StatusMatricula.dossie_ativo
     )
-    
     matricula = MatriculaEntradaSistema(
         id_estudante         = estudante.id,
         curso                = dados["curso"],
         modalidade           = modalidade,
+        tipo_cota_pcd        = tipo_cota_pcd,
         periodo_referencia   = dados["periodo"],
         declarou_necessidade = declarou_necessidade,
         status               = status_inicial,
@@ -59,7 +60,7 @@ async def registrar_estudante_via_suap(
     db.add(matricula)
     await db.flush()
 
-    # 4. Cria dossiê se não existir
+    # 4. cria dossiê vazio automaticamente
     result_dossie = await db.execute(
         select(DossiePerfilLongitudinalEstudante)
         .where(DossiePerfilLongitudinalEstudante.id_estudante == estudante.id)
@@ -70,7 +71,6 @@ async def registrar_estudante_via_suap(
 
     await db.commit()
     
-    # Refresh com eager loading dos dados do estudante para o schema de resposta
     stmt = (
         select(MatriculaEntradaSistema)
         .options(selectinload(MatriculaEntradaSistema.estudante))
